@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>小红书精选</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: #0a0a0a;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .header {
+            position: relative;
+            padding: 20px 24px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            overflow: hidden;
+        }
+        
+        .header-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        .header-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 100%;
+        }
+        
+        .header-left {
+            flex: 0 0 auto;
+        }
+        
+        .header-right {
+            text-align: right;
+            flex: 0 0 auto;
+        }
+        
+        .header-title {
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 38px;
+            letter-spacing: 8px;
+            color: #fff;
+            text-shadow: 0 2px 12px rgba(0,0,0,0.5);
+        }
+        
+        .header-subtitle {
+            font-size: 13px;
+            color: #ff6b8a;
+            margin-top: 4px;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+        
+        .header-right-title {
+            font-family: "Ma Shan Zheng", serif;
+            font-size: 18px;
+            letter-spacing: 3px;
+            color: rgba(255,255,255,0.9);
+            text-shadow: 0 1px 6px rgba(0,0,0,0.3);
+        }
+        
+        .header-right-meta {
+            font-size: 12px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 6px;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+        
+        .tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 14px;
+            text-align: center;
+            font-size: 15px;
+            color: #888;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+        }
+        
+        .tab.active {
+            color: #ff6b8a;
+            border-bottom-color: #ff6b8a;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+            padding: 16px 20px 90px;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .group-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #666;
+            margin: 20px 0 12px 4px;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .group-title .badge {
+            background: #ff6b8a;
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .folder-item {
+            margin-bottom: 8px;
+        }
+        
+        .folder-header {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 14px 18px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+            border-left: 4px solid #4a9eff;
+        }
+        
+        .folder-header:hover {
+            background: #333;
+            transform: translateX(4px);
+        }
+        
+        .folder-icon {
+            font-size: 18px;
+        }
+        
+        .folder-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e0e0e0;
+            flex: 1;
+        }
+        
+        .folder-count {
+            font-size: 12px;
+            color: #888;
+        }
+        
+        .folder-arrow {
+            font-size: 12px;
+            color: #666;
+            transition: transform 0.2s;
+        }
+        
+        .folder-content {
+            padding-left: 20px;
+            margin-top: 8px;
+            border-left: 2px solid #333;
+        }
+        
+        .file-item {
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 16px 18px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.3);
+            cursor: pointer;
+            border-left: 4px solid #ff6b8a;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+        
+        .file-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(255,107,138,0.2);
+        }
+        
+        .file-item:active {
+            transform: scale(0.98);
+        }
+        
+        .file-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: #e0e0e0;
+            line-height: 1.4;
+        }
+        
+        .file-meta {
+            font-size: 12px;
+            color: #666;
+            margin-top: 6px;
+        }
+        
+        .content-text {
+            font-size: 15px;
+            line-height: 1.9;
+            color: #e0e0e0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+        
+        .content-text h1 { font-size: 22px; margin: 16px 0 8px; color: #ff6b8a; }
+        .content-text h2 { font-size: 19px; margin: 14px 0 6px; color: #e0e0e0; }
+        .content-text h3 { font-size: 17px; margin: 12px 0 4px; color: #aaa; }
+        .content-text a { color: #ff6b8a; }
+        .content-text li { margin-left: 20px; margin-bottom: 4px; }
+        .content-text code { 
+            background: #2a2a2a; 
+            padding: 2px 6px; 
+            border-radius: 4px; 
+            font-size: 13px;
+            color: #ff6b8a;
+        }
+        .content-text pre {
+            background: #2a2a2a;
+            padding: 12px;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .toolbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #1a1a1a;
+            padding: 12px 20px;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.5);
+            display: flex;
+            gap: 10px;
+        }
+        
+        .toolbar button {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+        
+        .toolbar button:active {
+            transform: scale(0.97);
+        }
+        
+        .btn-xhs {
+            background: linear-gradient(135deg, #ff2442 0%, #ff6b8a 100%);
+            color: white;
+        }
+        
+        .btn-copy {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+        
+        .btn-back {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            background: #1a1a1a;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #ff6b8a;
+            cursor: pointer;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,107,138,0.9);
+            color: white;
+            padding: 10px 24px;
+            border-radius: 20px;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 9999;
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <canvas class="header-canvas" id="headerCanvas"></canvas>
+        <div class="header-content">
+            <div class="header-left">
+                <div class="header-title">萤晖</div>
+                <div class="header-subtitle"><strong>群号：1103047119</strong></div>
+            </div>
+            <div class="header-right">
+                <div class="header-right-title">小红书精选</div>
+                <div class="header-right-meta">12 篇笔记</div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('list')">📂 文件列表</div>
+        <div class="tab" onclick="switchTab('content')">📄 笔记内容</div>
+    </div>
+    
+    <div id="listView" class="tab-content active"></div>
+    <div id="contentView" class="tab-content">
+        <button class="btn-back" onclick="switchTab('list')">← 返回列表</button>
+        <div id="contentText" class="content-text"></div>
+    </div>
+    
+    <div class="toolbar">
+        <button class="btn-xhs" onclick="openXhs()">🔗 小红书</button>
+        <button class="btn-copy" onclick="copyContent()">📋 复制笔记</button>
+    </div>
+    
+    <div id="toast" class="toast"></div>
+    
+    <script>
+        const files = {"files":[{"name":"文案1_反差萌路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 反差萌路线\n\n**标题：**  puppy只是想找个能rua头的主人，这很过分吗？🐾\n\n**正文：**\n白天是人模人样的社畜，晚上就想做一只情绪稳定的小狗。\n不黏人，但会摇尾巴；不吵闹，但听得懂指令。\nDaddy型人格优先，不是真的爹，是情绪稳定、会讲道理、偶尔还有点凶的那种。\n\n📌 划重点：成年人，只交朋友，不谈剧本，真诚第一。\n\n💬 评论区：你更想rua别人还是被别人rua？\n\n**话题：** #puppy #daddy #小狗文学 #成年人社交 #兴趣交友 #反差萌 #小狗日记 #交友文案\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案3_温柔治愈路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 温柔治愈路线\n\n**标题：**  puppy的尾巴只会为一个人摇🐕\n\n**正文：**\n不需要很多人喜欢我，只要一个Daddy就够了。\n他会在我低头的时候摸摸我的头，说“做得很好”。\n也会在我调皮的时候板着脸，让我知道自己该收一收。\n\n这样的关系，不是卑微，是被选中的安全感。\n\n💬 评论区：你觉得被坚定地选择是什么感觉？\n\n**话题：** #puppy #daddy #小狗的爱 #安全感 #被选择 #治愈系 #成年人的糖 #交友\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案4_幽默吐槽路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 幽默吐槽路线\n\n**标题：**  我发誓我是一只听话的puppy，除了偶尔拆家🙃\n\n**正文：**\n会撒娇、会蹭、会眼巴巴看着你。\n但也会在你忙的时候自己趴一边，不吵不闹。\nDaddy请注意：此小狗偶尔有反骨，需要耐心驯化（不是）。\n\n🔔 免责声明：不是宠物，是人，请尊重我的意愿和边界。\n\n💬 评论区：你养过什么“拆家”型生物？🐶\n\n**话题：** #puppy #小狗文学 #搞笑交友 #Daddy #反差萌 #社恐交友 #可爱小狗 #小红书交友\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案6_傲娇型路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 傲娇型路线\n\n**标题：**  才不是非要Daddy呢，只是刚好你比较会照顾人😌\n\n**正文：**\n嘴上说着“我一个人也可以”，其实心里已经在偷偷摇尾巴了。\n喜欢被管，但不喜欢被命令。\n喜欢被宠，但也会乖乖听话。\n\n理想型：有分寸、有主见、有耐心的Daddy型。\n\n💬 评论区：你身边有没有嘴硬心软的人？\n\n**话题：** #puppy #傲娇小狗 #Daddy #嘴硬心软 #成年人社交 #兴趣交友 #反差 #小狗日记\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案7_真实真诚路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 真实真诚路线\n\n**标题：**  认真发个交友帖：puppy蹲Daddy🐾\n\n**正文：**\n先说好，这不是玩梗，是认真的兴趣社交。\n我性格偏软，喜欢被引导、被照顾的关系节奏。\n希望你：成年、尊重边界、情绪稳定、能沟通。\n\n不约、不钓鱼、不扶贫。聊得来再见面。\n\n💬 评论区：你理想中的关系节奏是什么样的？\n\n**话题：** #puppy #daddy #认真交友 #兴趣社交 #边界感 #情绪稳定 #成年人关系 #小狗蹲主人\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案8_甜欲路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 甜欲路线（轻）\n\n**标题：**  想做你的专属puppy，只对一个人摇尾巴🍬\n\n**正文：**\n眼睛只看着你，耳朵只听你说话，尾巴只为你摇。\n不是所有人都配叫Daddy，只有让我心甘情愿低头的那个人才行。\n\n⚠️ 仅限成年人、仅限平等自愿、仅限互相尊重。\n\n💬 评论区：你遇到过让你心甘情愿的人吗？\n\n**话题：** #puppy #daddy #专属小狗 #甜蜜暴击 #成年人社交 #兴趣交友 #小狗文学 #只喜欢你\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案9_日常感路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 日常感路线\n\n**标题：**  理想的一天：Daddy说“今天表现不错”🐕‍🦺\n\n**正文：**\n早起被安排好早餐，出门被提醒带伞，晚上被摸摸头说晚安。\n不需要多轰轰烈烈，就想要这种被放在心上的日常。\n\npuppy的快乐很简单：被看见、被记得、被夸奖。\n\n💬 评论区：哪句话会让你瞬间被治愈？\n\n**话题：** #puppy #daddy #理想日常 #被放在心上 #治愈系 #小狗的快乐 #情绪价值 #交友文案\n","mtime":"2026-06-21T12:21:30.784Z"},{"name":"文案10_神秘钓系路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 神秘钓系路线\n\n**标题：**  谁是那个能让我听话的人？🖤\n\n**正文：**\n外表：人乖话少，看起来很好相处。\n内心：其实是一只等认领的puppy。\n\nDaddy请自带：成熟、稳定、有边界感。\n不会随便低头，但认定了就会很乖。\n\n💬 评论区：什么类型的人会让你一秒听话？\n\n**话题：** #puppy #daddy #神秘小狗 #等人认领 #兴趣交友 #成年人社交 #黑色系 #小狗文学\n","mtime":"2026-06-21T12:21:30.783Z"},{"name":"文案2_直球型路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 直球型路线\n\n**标题：**  招一只Daddy，会管人会宠人的那种👀\n\n**正文：**\n不是找爸爸，是找一种能让人安心的相处模式。\n我喜欢被安排好的行程，也喜欢被夸“乖”的时候。\n如果你能carry全场，那我愿意乖乖当你的puppy。\n\n⚠️ 雷区：未成年勿扰、控制欲过头勿扰、不尊重边界勿扰。\n\n💬 评论区：什么样的“乖”会让你心动？\n\n**话题：** #puppy日常 #Daddy #小圈文化 #交友贴 #情绪价值 #边界感 #成年人的快乐\n","mtime":"2026-06-21T12:21:30.783Z"},{"name":"文案5_氛围感路线.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案 · 氛围感路线\n\n**标题：**  想被揉进怀里的那种喜欢💫\n\n**正文：**\n不是轰轰烈烈的恋爱，是安静的、被接住的感觉。\n像小狗一样跟在你身边，不用说话也很安心。\nDaddy不是角色，是一种让人想靠近的气质。\n\n🌙 慢热型puppy，蹲一个同样喜欢慢慢来的人。\n\n💬 评论区：你更喜欢热烈还是温柔的关系？\n\n**话题：** #puppy #daddy #氛围感 #慢热 #温柔社交 #情绪稳定 #成年人的陪伴 #交友贴\n","mtime":"2026-06-21T12:21:30.783Z"},{"name":"Puppy与Daddy_小红书交友文案_10份.md","dir":"交友文案","content":"# Puppy与Daddy 小红书交友文案合集\n\n> 风格：小红书爆款体｜带话题标签｜互动钩子｜风险规避提示\n> 适用：成年人交友/兴趣社群内容，发布前请结合平台规则二次审核\n\n---\n\n## 文案 1：反差萌路线\n**标题：**  puppy只是想找个能rua头的主人，这很过分吗？🐾\n\n**正文：**\n白天是人模人样的社畜，晚上就想做一只情绪稳定的小狗。\n不黏人，但会摇尾巴；不吵闹，但听得懂指令。\nDaddy型人格优先，不是真的爹，是情绪稳定、会讲道理、偶尔还有点凶的那种。\n\n📌 划重点：成年人，只交朋友，不谈剧本，真诚第一。\n\n💬 评论区：你更想rua别人还是被别人rua？\n\n**话题：** #puppy #daddy #小狗文学 #成年人社交 #兴趣交友 #反差萌 #小狗日记 #交友文案\n\n---\n\n## 文案 2：直球型路线\n**标题：**  招一只Daddy，会管人会宠人的那种👀\n\n**正文：**\n不是找爸爸，是找一种能让人安心的相处模式。\n我喜欢被安排好的行程，也喜欢被夸“乖”的时候。\n如果你能carry全场，那我愿意乖乖当你的puppy。\n\n⚠️ 雷区：未成年勿扰、控制欲过头勿扰、不尊重边界勿扰。\n\n💬 评论区：什么样的“乖”会让你心动？\n\n**话题：** #puppy日常 #Daddy #小圈文化 #交友贴 #情绪价值 #边界感 #成年人的快乐\n\n---\n\n## 文案 3：温柔治愈路线\n**标题：**  puppy的尾巴只会为一个人摇🐕\n\n**正文：**\n不需要很多人喜欢我，只要一个Daddy就够了。\n他会在我低头的时候摸摸我的头，说“做得很好”。\n也会在我调皮的时候板着脸，让我知道自己该收一收。\n\n这样的关系，不是卑微，是被选中的安全感。\n\n💬 评论区：你觉得被坚定地选择是什么感觉？\n\n**话题：** #puppy #daddy #小狗的爱 #安全感 #被选择 #治愈系 #成年人的糖 #交友\n\n---\n\n## 文案 4：幽默吐槽路线\n**标题：**  我发誓我是一只听话的puppy，除了偶尔拆家🙃\n\n**正文：**\n会撒娇、会蹭、会眼巴巴看着你。\n但也会在你忙的时候自己趴一边，不吵不闹。\nDaddy请注意：此小狗偶尔有反骨，需要耐心驯化（不是）。\n\n🔔 免责声明：不是宠物，是人，请尊重我的意愿和边界。\n\n💬 评论区：你养过什么“拆家”型生物？🐶\n\n**话题：** #puppy #小狗文学 #搞笑交友 #Daddy #反差萌 #社恐交友 #可爱小狗 #小红书交友\n\n---\n\n## 文案 5：氛围感路线\n**标题：**  想被揉进怀里的那种喜欢💫\n\n**正文：**\n不是轰轰烈烈的恋爱，是安静的、被接住的感觉。\n像小狗一样跟在你身边，不用说话也很安心。\nDaddy不是角色，是一种让人想靠近的气质。\n\n🌙 慢热型puppy，蹲一个同样喜欢慢慢来的人。\n\n💬 评论区：你更喜欢热烈还是温柔的关系？\n\n**话题：** #puppy #daddy #氛围感 #慢热 #温柔社交 #情绪稳定 #成年人的陪伴 #交友贴\n\n---\n\n## 文案 6：傲娇型路线\n**标题：**  才不是非要Daddy呢，只是刚好你比较会照顾人😌\n\n**正文：**\n嘴上说着“我一个人也可以”，其实心里已经在偷偷摇尾巴了。\n喜欢被管，但不喜欢被命令。\n喜欢被宠，但也会乖乖听话。\n\n理想型：有分寸、有主见、有耐心的Daddy型。\n\n💬 评论区：你身边有没有嘴硬心软的人？\n\n**话题：** #puppy #傲娇小狗 #Daddy #嘴硬心软 #成年人社交 #兴趣交友 #反差 #小狗日记\n\n---\n\n## 文案 7：真实真诚路线\n**标题：**  认真发个交友帖：puppy蹲Daddy🐾\n\n**正文：**\n先说好，这不是玩梗，是认真的兴趣社交。\n我性格偏软，喜欢被引导、被照顾的关系节奏。\n希望你：成年、尊重边界、情绪稳定、能沟通。\n\n不约、不钓鱼、不扶贫。聊得来再见面。\n\n💬 评论区：你理想中的关系节奏是什么样的？\n\n**话题：** #puppy #daddy #认真交友 #兴趣社交 #边界感 #情绪稳定 #成年人关系 #小狗蹲主人\n\n---\n\n## 文案 8：甜欲路线（轻）\n**标题：**  想做你的专属puppy，只对一个人摇尾巴🍬\n\n**正文：**\n眼睛只看着你，耳朵只听你说话，尾巴只为你摇。\n不是所有人都配叫Daddy，只有让我心甘情愿低头的那个人才行。\n\n⚠️ 仅限成年人、仅限平等自愿、仅限互相尊重。\n\n💬 评论区：你遇到过让你心甘情愿的人吗？\n\n**话题：** #puppy #daddy #专属小狗 #甜蜜暴击 #成年人社交 #兴趣交友 #小狗文学 #只喜欢你\n\n---\n\n## 文案 9：日常感路线\n**标题：**  理想的一天：Daddy说“今天表现不错”🐕‍🦺\n\n**正文：**\n早起被安排好早餐，出门被提醒带伞，晚上被摸摸头说晚安。\n不需要多轰轰烈烈，就想要这种被放在心上的日常。\n\npuppy的快乐很简单：被看见、被记得、被夸奖。\n\n💬 评论区：哪句话会让你瞬间被治愈？\n\n**话题：** #puppy #daddy #理想日常 #被放在心上 #治愈系 #小狗的快乐 #情绪价值 #交友文案\n\n---\n\n## 文案 10：神秘钓系路线\n**标题：**  谁是那个能让我听话的人？🖤\n\n**正文：**\n外表：人乖话少，看起来很好相处。\n内心：其实是一只等认领的puppy。\n\nDaddy请自带：成熟、稳定、有边界感。\n不会随便低头，但认定了就会很乖。\n\n💬 评论区：什么类型的人会让你一秒听话？\n\n**话题：** #puppy #daddy #神秘小狗 #等人认领 #兴趣交友 #成年人社交 #黑色系 #小狗文学\n\n---\n\n## 🚨 发布前自查清单（避坑指南）\n\n- [ ] 内容是否面向成年人，无未成年暗示？\n- [ ] 是否有明确的“尊重边界、自愿平等”表达？\n- [ ] 图片是否合规（避免敏感道具、过度暗示）？\n- [ ] 评论区是否及时引导，避免引战或违规？\n- [ ] 是否避免直接交易、约见、金钱往来等敏感词？\n- [ ] 平台规则更新时，请再次检查话题和关键词是否被限制。\n\n> 小红书审核对“小圈”“puppy”“daddy”等关键词较敏感，建议用emoji、谐音或分段表达规避误伤，同时保留正向价值引导。\n","mtime":"2026-06-21T12:19:48.094Z"},{"name":"找搭子指南_v2.0.pdf","dir":"找搭子步骤","content":"\n\n找搭子行动指南 v2.0\n—— 找搭子别犬慷，动起来才能找到搭子！ ——\n【 第一步 】 获取文案\n●每天群里会统一推送当日交友文案，直接复制使用，省去编写的麻烦。\n【 第二步 】 发布到平台\n●将文案发布到 小红书 / 微博 / 抖音 （任选一个或多个），发布后记得适当养号，提高曝光度。\n【 第三步 】 与女生正确聊天方式\n\u0000 正确做法\n●不要一上来就 要照片 / 发照片\n●先聊兴趣、聊日常，用人格魅力吸引对方\n\u0000 常见错误\n●“发张照片看看唉” / “你长什么样” —— 绝对不要这样问！\n\u0000 保持真诚，互相尊重\n●说话有礼谨，不开过分的欺笑\n●不要油腔滑调，真诚永远是最重要的\n●对方不想回答的问题，不要追问\n\u0000 渐进忙渐了解\n●先从共同爱好入手，找到话题\n●聊彻此的城市、工作、生活习惯\n●了解对方的三观和性格，这比外表重要得多\n群号 1103047119\n\n【 第三步 】 与女生正确聊天方式 （继续）\n\u0000 见面之前，禁止聊这些话题：\n●不要问身高体重三围\n●不要聊敏感 / 播边话题\n●不要发奇怪的表情包或链接\n●不要怪于见面或要联系方式\n\u0000 什么时候可以见面？\n●双方聊了一段时间，感觉彻此合适、互相有好感\n●且双方都有见面意愿，再考虑线下见面\n【 第四步 】 保持活跃\n●每天坚持发布文案，有人评论或私信及时回复，不要冷场。\n★ 本群交友规范\n真诚友善 \u0000  |  互相尊重 \u0000  |  拒绝骇扰 \u0000  |  拒绝快餐式社交 \u0000\n每日群内提供标准交友文案，直接复制使用\n推荐先聊关注，清楚内容再进行深度交流\n—— 慢慢来，才有好故事 ——\n群号：1103047119\n群号 1103047119","mtime":"2026-06-21T12:16:16.840Z"}],"folders":["交友文案","圈内资料","找搭子步骤"]};
+        let currentFile = null;
+        
+                    function renderFileList() {
+            const listView = document.getElementById('listView');
+            listView.innerHTML = '';
+            
+            // 从 filesJson 获取所有文件夹列表
+            const allFolders = files.folders || [];
+            
+            // 构建文件夹树（按 dir 字段分组）
+            const folders = {};
+            files.files.forEach(file => {
+                const dir = file.dir || '';
+                if (!folders[dir]) folders[dir] = [];
+                folders[dir].push(file);
+            });
+            
+            // 显示所有一级子文件夹
+            allFolders.forEach(folderName => {
+                const folderDiv = document.createElement('div');
+                folderDiv.className = 'folder-group';
+                
+                const header = document.createElement('div');
+                header.className = 'folder-header';
+                const fileCount = (folders[folderName] || []).length;
+                header.innerHTML = '<span class="folder-icon">📁</span>' + 
+                    folderName + ' <span class="folder-count">(' + fileCount + ')</span>' + 
+                    '<span class="folder-arrow">▼</span>';
+                
+                const body = document.createElement('div');
+                body.className = 'folder-body';
+                body.style.display = 'none';
+                
+                header.onclick = () => {
+                    const isOpen = body.style.display !== 'none';
+                    body.style.display = isOpen ? 'none' : 'block';
+                    header.querySelector('.folder-arrow').textContent = isOpen ? '▼' : '▲';
+                };
+                
+                // 该文件夹下的文件按修改时间排序
+                const folderFiles = folders[folderName] || [];
+                folderFiles.sort((a, b) => new Date(b.mtime) - new Date(a.mtime));
+                folderFiles.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'file-item folder-file';
+                    item.onclick = (ev) => { ev.stopPropagation(); openFile(file); };
+                    
+                    const name = document.createElement('div');
+                    name.className = 'file-name';
+                    name.textContent = file.name.replace(/.(md|pdf|doc|docx|xls|xlsx|ppt|pptx)$/, '');
+                    
+                    const meta = document.createElement('div');
+                    meta.className = 'file-meta';
+                    meta.textContent = new Date(file.mtime).toLocaleString('zh-CN');
+                    
+                    item.appendChild(name);
+                    item.appendChild(meta);
+                    body.appendChild(item);
+                });
+                
+                folderDiv.appendChild(header);
+                folderDiv.appendChild(body);
+                listView.appendChild(folderDiv);
+            });
+        }
+            
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach((t, i) => {
+                t.classList.toggle('active', (tab === 'list' && i === 0) || (tab === 'content' && i === 1));
+            });
+            document.getElementById('listView').classList.toggle('active', tab === 'list');
+            document.getElementById('contentView').classList.toggle('active', tab === 'content');
+        }
+        
+        function openFile(file) {
+            currentFile = file;
+            const contentEl = document.getElementById('contentText');
+            contentEl.innerHTML = mdToHtml(file.content);
+            switchTab('content');
+        }
+        
+        function mdToHtml(md) {
+            return md
+                .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+                .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+                .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^\*]+)\*/g, '<em>$1</em>')
+                .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank">$1</a>')
+                .replace(/^- (.*$)/gm, '<li>$1</li>')
+                .replace(/```([\s\S]*?)```/g, '<pre><code>$1</code></pre>')
+                .replace(/`([^`]+)`/g, '<code>$1</code>')
+                .replace(/\n\n/g, '</p><p>')
+                .replace(/\n/g, '<br>');
+        }
+        
+        function openXhs() {
+            showToast('请在小红书 APP 中搜索相关内容');
+        }
+        
+        function copyContent() {
+            if (!currentFile) {
+                showToast('请先选择一个文件');
+                return;
+            }
+            const text = currentFile.content;
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('✅ 已复制到剪贴板');
+            }).catch(() => {
+                // Fallback
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                document.body.appendChild(ta);
+                ta.select();
+                document.execCommand('copy');
+                document.body.removeChild(ta);
+                showToast('✅ 已复制到剪贴板');
+            });
+        }
+        
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 2000);
+        }
+        
+        function generateHeaderBackground() {
+            const canvas = document.getElementById('headerCanvas');
+            const header = canvas.parentElement;
+            canvas.width = header.offsetWidth;
+            canvas.height = header.offsetHeight;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // 深色渐变背景
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#1a0a0a');
+            gradient.addColorStop(0.5, '#0a0a0a');
+            gradient.addColorStop(1, '#1a0a0a');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // 绘制红色光晕
+            const drawGlow = function(x, y, radius, color) {
+                const glow = ctx.createRadialGradient(x, y, 0, x, y, radius);
+                glow.addColorStop(0, color);
+                glow.addColorStop(1, 'transparent');
+                ctx.fillStyle = glow;
+                ctx.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+            };
+            
+            drawGlow(canvas.width * 0.2, canvas.height * 0.5, 150, 'rgba(255, 36, 66, 0.15)');
+            drawGlow(canvas.width * 0.8, canvas.height * 0.5, 120, 'rgba(255, 107, 138, 0.1)');
+            
+            // 绘制萤火虫效果（小圆点）
+            for (let i = 0; i < 30; i++) {
+                const x = Math.random() * canvas.width;
+                const y = Math.random() * canvas.height;
+                const radius = Math.random() * 2 + 0.5;
+                const opacity = Math.random() * 0.3 + 0.1;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, radius, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(255, 107, 138, ' + opacity + ')';
+                ctx.fill();
+            }
+            
+            // 绘制流动线条
+            ctx.strokeStyle = 'rgba(255, 36, 66, 0.08)';
+            ctx.lineWidth = 1;
+            for (let i = 0; i < 5; i++) {
+                ctx.beginPath();
+                const startY = Math.random() * canvas.height;
+                ctx.moveTo(0, startY);
+                for (let x = 0; x < canvas.width; x += 50) {
+                    ctx.quadraticCurveTo(
+                        x, startY + Math.sin(x * 0.02 + i) * 20,
+                        x + 25, startY + Math.sin((x + 25) * 0.02 + i) * 20
+                    );
+                }
+                ctx.stroke();
+            }
+        }
+        
+        // 页面加载后生成背景
+        window.addEventListener('load', generateHeaderBackground);
+        window.addEventListener('resize', generateHeaderBackground);
+        
+        renderFileList();
+    </script>
+</body>
+</html>
